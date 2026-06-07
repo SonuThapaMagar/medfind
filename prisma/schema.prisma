@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  PHARMACY_OWNER
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pharmacyOwner PharmacyOwner?
+}
+
+model Pharmacy {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  address   String
+  lat       Float
+  lng       Float
+  phone     String?
+  imageUrl  String?
+  isOpen    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner     PharmacyOwner?
+  inventory Inventory[] // A pharmacy has many inventory entries
+}
+
+model PharmacyOwner {
+  id         String @id @default(cuid())
+  userId     String @unique // one user can only own one pharmacy
+  pharmacyId String @unique // one pharmacy has one owner (for now)
+
+  user     User     @relation(fields: [userId], references: [id])
+  pharmacy Pharmacy @relation(fields: [pharmacyId], references: [id])
+}
+
+model Medicine {
+  id          String  @id @default(cuid())
+  name        String // Brand name: "Panadol"
+  genericName String // Generic name: "Paracetamol"
+  category    String // "Antibiotic", "Painkiller", "Antidiabetic"
+  unit        String // "tablet", "syrup", "injection"
+  description String?
+
+  // Relations
+  inventory Inventory[]
+}
+
+model Inventory {
+  id        String   @id @default(cuid())
+  quantity  Int
+  price     Float // Price in NPR
+  updatedAt DateTime @updatedAt // auto-updates every time this row changes
+
+  pharmacyId String
+  medicineId String
+
+  pharmacy Pharmacy @relation(fields: [pharmacyId], references: [id])
+  medicine Medicine @relation(fields: [medicineId], references: [id])
+
+  @@unique([pharmacyId, medicineId]) // One entry per medicine per pharmacy
+}
