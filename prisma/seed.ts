@@ -1,5 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import "dotenv/config";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
@@ -8,7 +9,30 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding db");
 
-  //Create medicine
+  // --- USERS first (no dependencies on other tables) ---
+  const hashedPassword = await bcrypt.hash("password123", 10);
+
+  const adminUser = await prisma.user.create({
+    data: {
+      name: "Admin User",
+      email: "admin@medfind.com",
+      password: hashedPassword,
+      role: "ADMIN",
+    },
+  });
+
+  const ownerUser = await prisma.user.create({
+    data: {
+      name: "Ram Kumar",
+      email: "ram@pharmacy.com",
+      password: hashedPassword,
+      role: "PHARMACY_OWNER",
+    },
+  });
+
+  console.log("Created users:", adminUser.email, ownerUser.email);
+
+  //create medicine
   const paracetamol = await prisma.medicine.create({
     data: {
       name: "Panadol",
