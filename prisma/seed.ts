@@ -8,7 +8,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding db");
 
-  //create medicine
+  //Create medicine
   const paracetamol = await prisma.medicine.create({
     data: {
       name: "Panadol",
