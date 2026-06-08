@@ -1,7 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // getToken reads and verifies the JWT cookie from the request.
   // Returns null if the user is not logged in.
   const token = await getToken({
