@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
@@ -36,7 +37,7 @@ export default function LoginPage() {
     }
 
     if (result?.ok) {
-      router.push("/");
+      router.push("/dashboard");
       router.refresh();
     }
     setLoading(false);
@@ -60,7 +61,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@medfind.com"
                 required
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors text-black"
               />
             </div>
 
@@ -76,7 +77,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full px-3 py-2 pr-10 text-sm border border-gray-200 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
+                  className="w-full px-3 py-2 pr-10 text-sm border border-gray-200 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors  text-black"
                 />
 
                 {/* Eye toggle button */}
@@ -143,6 +144,13 @@ export default function LoginPage() {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
+
+          <p className="text-sm text-gray-400 text-center mt-4">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-green-600 hover:underline">
+              Create one
+            </Link>
+          </p>
         </div>
       </div>
     </>
