@@ -35,6 +35,9 @@ export async function proxy(request: NextRequest) {
 
   // --- Rule 3: If already logged in, don't show login page ---
   if (pathname === "/login" && token) {
+    if (token.role === "PHARMACY" || token.role === "ADMIN") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
     return NextResponse.redirect(new URL("/", request.url));
   }
 

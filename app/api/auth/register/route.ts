@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   const validation = registerSchema.safeParse(body);
   if (!validation.success) {
     return NextResponse.json(
-      { error: validation.error.issues[0]?.message },
+      { errors: validation.error.flatten().fieldErrors },
       { status: 400 },
     );
   }
