@@ -1,7 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { prisma } from "@/lib/prisma";
 import { useEffect, useState } from "react";
+
+const PharmacyMap = dynamic(() => import("@/components/PharmacyMap"), {
+  ssr: false,
+  loading: () => (
+    <div
+      style={{ height: "400px" }}
+      className="w-full rounded-xl border border-gray-200 bg-gray-100 animate-pulse"
+    />
+  ),
+});
 
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -91,7 +102,31 @@ export default function HomePage() {
       {/* Results area */}
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Loading state */}
-        {isLoading && <p className="text-sm text-gray-400">Searching...</p>}
+        {isLoading && (
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="bg-white border border-gray-200 rounded-xl p-4"
+              >
+                {/* Skeleton top row */}
+                <div className="flex justify-between mb-3">
+                  <div className="flex flex-col gap-2">
+                    <div className="h-3.5 w-36 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                  <div className="h-6 w-12 bg-gray-100 rounded-full animate-pulse" />
+                </div>
+                {/* Skeleton bottom row */}
+                <div className="flex gap-4 pt-3 border-t border-gray-100">
+                  <div className="h-3 w-16 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-3 w-16 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-3 w-20 bg-gray-100 rounded animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Empty state */}
         {!searchTerm && !isLoading && (
@@ -116,6 +151,12 @@ export default function HomePage() {
           </p>
         )}
 
+        {results.length > 0 && (
+          <div className="mb-6">
+            <PharmacyMap results={results} />
+          </div>
+        )}
+        
         {/* Results list */}
         {results.map((item: any) => (
           <div
