@@ -12,14 +12,24 @@ async function main() {
   // --- USERS first (no dependencies on other tables) ---
   const hashedPassword = await bcrypt.hash("password123", 10);
 
-  const adminUser = await prisma.user.create({
-    data: {
-      name: "Admin User",
+  const adminUser = await prisma.user.upsert({
+    where: { email: "admin@medfind.com" },
+    update: {}, // If the user exists, do nothing
+    create: {
       email: "admin@medfind.com",
       password: hashedPassword,
       role: "ADMIN",
     },
   });
+
+  // const adminUser = await prisma.user.create({
+  //   data: {
+  //     name: "Admin User",
+  //     email: "admin@medfind.com",
+  //     password: hashedPassword,
+  //     role: "ADMIN",
+  //   },
+  // });
 
   const ownerUser = await prisma.user.create({
     data: {
