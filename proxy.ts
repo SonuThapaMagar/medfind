@@ -1,7 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // getToken reads and verifies the JWT cookie from the request.
   // Returns null if the user is not logged in.
   const token = await getToken({
@@ -10,9 +10,10 @@ export async function proxy(request: NextRequest) {
   });
 
   const { pathname } = request.nextUrl;
-
+ console.log("proxy running on:", pathname, "| role:", token?.role);
   // --- Rule 1: Dashboard is for pharmacy owners and admins only ---
   if (pathname.startsWith("/dashboard")) {
+       console.log("dashboard check — token:", !!token, "role:", token?.role);
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -21,6 +22,7 @@ export async function proxy(request: NextRequest) {
       // Logged in but wrong role → redirect home
       return NextResponse.redirect(new URL("/", request.url));
     }
+      console.log("dashboard: letting through");
   }
 
   // --- Rule 2: Admin routes are for admins only ---

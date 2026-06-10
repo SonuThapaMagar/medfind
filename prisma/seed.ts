@@ -143,6 +143,14 @@ async function main() {
     ],
   });
 
+  await prisma.pharmacyOwner.create({
+    data: {
+      userId: ownerUser.id,
+      pharmacyId: pharmacy2.id,
+    },
+  });
+  console.log("Linked Ram Kumar to Baneshwor Medical");
+
   console.log("Done! Created 3 medicines, 3 pharmacies, 6 inventory records.");
 }
 
