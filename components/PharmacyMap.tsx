@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -42,7 +41,7 @@ export default function PharmacyMap({ results }: Props) {
   return (
     <div
       style={{ height: "400px" }}
-      className="w-full rounded-xl border border-gray-200 overflow-hidden"
+      className="w-full rounded-xl border border-light-gray overflow-hidden relative z-0"
     >
       <MapContainer
         center={center}

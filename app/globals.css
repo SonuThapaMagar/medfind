@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -9,7 +9,7 @@
 @theme {
   --color-primary: #01377d;
   --color-secondary: #06a9df;
-  --color-tertiary-light: #97e7f5;
+  --color-tertiary: #97e7f5;
 
   --color-success-light: #7ed348;
   --color-success: #26b170;
@@ -42,4 +42,9 @@ body {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 10 !important;
 }
