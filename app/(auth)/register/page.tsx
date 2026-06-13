@@ -1,162 +1,281 @@
 "use client";
 
-import { useState } from "react";
+import {
+  Anchor,
+  Button,
+  Checkbox,
+  Divider,
+  Group,
+  PasswordInput,
+  Stepper,
+  Stack,
+  Text,
+  TextInput,
+  Paper,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
+import { GoogleButton } from "@/components/ui/socialButtons";
+import dynamic from "next/dynamic";
+import classes from "@/components/modules/AuthenticationImage.module.css";
+import {
+  RegisterOwnerInput,
+  registerOwnerSchema,
+} from "@/lib/validations/auth";
+import { STEP_FIELDS } from "@/constants/auth.constants";
+
+const LocationPicker = dynamic(() => import("@/components/ui/LocationPicker"), {
+  ssr: false,
+});
 
 export default function RegisterPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(false);
-
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  const form = useForm<RegisterOwnerInput>({
+    initialValues: {
+      // step 1 — personal
+      name: "",
+      email: "",
+      password: "",
+      // step 2 — pharmacy
+      pharmacyName: "",
+      pharmacyEmail: "",
+      pharmacyPhone: "",
+      pharmacyAddress: "",
+      // step 3
+      pharmacyLat: 0,
+      pharmacyLng: 0,
+      terms: false as unknown as true,
+    },
+    validate: (values) => {
+      const parsed = registerOwnerSchema.safeParse(values);
+      if (parsed.success) return {};
+
+      // Convert Zod issues into Mantine's { fieldName: message } format
+      return parsed.error.issues.reduce(
+        (acc, issue) => {
+          const field = issue.path[0] as string;
+          if (!acc[field]) acc[field] = issue.message;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+    },
+  });
+
+  function nextStep() {
+    const fields = STEP_FIELDS[active];
+    if (!fields) return;
+    const result = form.validate();
+    const stepHasErrors = fields.some(
+      (field) => result.errors[field as string],
+    );
+    if (stepHasErrors) return;
+    setActive((c) => Math.min(c + 1, 3));
+  }
+
+  function prevStep() {
+    setActive((c) => Math.max(c - 1, 0));
+  }
+
+  async function handleSubmit(values: RegisterOwnerInput) {
     setLoading(true);
     setError("");
+    try {
+      const parsed = registerOwnerSchema.safeParse(values);
+      if (!parsed.success) {
+        setError(parsed.error.issues[0].message);
+        setLoading(false);
+        return;
+      }
 
-    // Send POST to your register API route
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // tells the server: the body is JSON, not a form
-      },
-      body: JSON.stringify({ name, email, password }),
-      // JSON.stringify converts the JS object to a JSON string
-    });
-
-    const data = await response.json();
-    console.log("register response:", data);
-
-    if (!response.ok) {
-      // response.ok is true for 200-299, false for everything else
-      setError(data.error);
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...parsed.data, role: "PHARMACY_OWNER" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error);
+        return;
+      }
+      router.push("/login");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Success — go to login so they can sign in
-    router.push("/login");
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-xl p-8">
-        <h1 className="text-xl font-medium text-gray-900 mb-1">
-          Create account
-        </h1>
-        <p className="text-sm text-gray-400 mb-6">MedFind Nepal</p>
+    <>
+      <div className={classes.wrapper}>
+        <Paper className={classes.form}>
+          <img
+            src="/logo.png"
+            alt="MedFind"
+            className="mx-auto mb-4 h-10 w-auto"
+          />
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Name */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-gray-600">Full name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ram Kumar"
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors text-black"
+          <Text size="lg" fw={600} ta="center" mb="lg">
+            Register as Pharmacy Owner
+          </Text>
+
+          <Divider
+            labelPosition="center"
+            mb="lg"
+            styles={{
+              label: { color: "var(--mantine-color-bright)", opacity: 0.85 },
+            }}
+          />
+
+          <form onSubmit={form.onSubmit(handleSubmit)}>
+            <Stepper active={active} mb="xl">
+              {/* Step 1 — Personal info */}
+              <Stepper.Step label="Account" description="Personal details">
+                <Stack mt="md">
+                  <TextInput
+                    required
+                    label="Full Name"
+                    placeholder="Ram Kumar"
+                    radius="md"
+                    {...form.getInputProps("name")}
+                  />
+                  <TextInput
+                    required
+                    label="Email"
+                    placeholder="ram@pharmacy.com"
+                    radius="md"
+                    {...form.getInputProps("email")}
+                  />
+                  <PasswordInput
+                    required
+                    label="Password"
+                    placeholder="Min. 6 characters"
+                    radius="md"
+                    {...form.getInputProps("password")}
+                  />
+                </Stack>
+              </Stepper.Step>
+
+              {/* Step 2 — Pharmacy info */}
+              <Stepper.Step label="Pharmacy" description="Your pharmacy">
+                <Stack mt="md">
+                  <TextInput
+                    required
+                    label="Pharmacy Name"
+                    placeholder="New Road Pharmacy"
+                    radius="md"
+                    {...form.getInputProps("pharmacyName")}
+                  />
+                  <TextInput
+                    required
+                    label="Pharmacy Email"
+                    placeholder="newroad@gmail.com"
+                    radius="md"
+                    {...form.getInputProps("pharmacyEmail")}
+                  />
+                  <TextInput
+                    required
+                    label="Phone"
+                    placeholder="01-4221234"
+                    radius="md"
+                    {...form.getInputProps("pharmacyPhone")}
+                  />
+                  <LocationPicker
+                    lat={form.values.pharmacyLat || null}
+                    lng={form.values.pharmacyLng || null}
+                    address={form.values.pharmacyAddress}
+                    onChange={(lat, lng, address) => {
+                      form.setFieldValue("pharmacyLat", lat);
+                      form.setFieldValue("pharmacyLng", lng);
+                      form.setFieldValue("pharmacyAddress", address);
+                    }}
+                  />
+                  {form.errors.pharmacyAddress && (
+                    <Text size="xs" c="red">
+                      {form.errors.pharmacyAddress}
+                    </Text>
+                  )}
+                </Stack>
+              </Stepper.Step>
+
+              {/* Step 3 — Confirm */}
+              <Stepper.Step label="Confirm" description="Review & submit">
+                <Stack mt="md">
+                  <Text size="sm" c="dimmed">
+                    You're registering <strong>{form.values.name}</strong> as
+                    owner of <strong>{form.values.pharmacyName}</strong>.
+                  </Text>
+                  <Checkbox
+                    label="I accept the terms and conditions"
+                    {...form.getInputProps("terms", { type: "checkbox" })}
+                  />
+                  {form.errors.terms && (
+                    <Text size="xs" c="red">
+                      {form.errors.terms}
+                    </Text>
+                  )}
+                </Stack>
+              </Stepper.Step>
+
+              <Stepper.Completed>
+                <Text ta="center" mt="md" c="dimmed">
+                  Creating your account...
+                </Text>
+              </Stepper.Completed>
+            </Stepper>
+
+            <Group justify="center" mt="xl">
+              {active > 0 && (
+                <Button variant="default" radius="xl" onClick={prevStep}>
+                  Back
+                </Button>
+              )}
+              {active < 2 && (
+                <Button radius="xl" onClick={nextStep}>
+                  Next
+                </Button>
+              )}
+              {active === 2 && (
+                <Button type="submit" radius="xl" loading={loading}>
+                  Register
+                </Button>
+              )}
+            </Group>
+
+            <Divider
+              label="Or continue with Google"
+              labelPosition="center"
+              my="lg"
+              styles={{
+                label: { color: "var(--mantine-color-bright)", opacity: 0.85 },
+              }}
             />
-          </div>
 
-          {/* Email */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-gray-600">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ram@example.com"
-              required
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors text-black"
-            />
-          </div>
+            <Group grow mb="md">
+              <GoogleButton radius="xl">Google</GoogleButton>
+            </Group>
 
-          {/* Password */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-gray-600">Password</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min. 6 characters"
-                required
-                className="w-full px-3 py-2 pr-10 text-sm border border-gray-200 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors text-black"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            <Group justify="center" mt="sm">
+              <Anchor
+                component={Link}
+                href="/login"
+                c="bright"
+                opacity={0.85}
+                size="xs"
               >
-                {showPassword ? (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                ) : (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {error && <p className="text-sm text-red-500">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors cursor-pointer"
-          >
-            {loading && (
-              <svg
-                className="animate-spin"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-              </svg>
-            )}
-            {loading ? "Creating account..." : "Create account"}
-          </button>
-        </form>
-
-        {/* Link to login */}
-        <p className="text-sm text-gray-400 text-center mt-4">
-          Already have an account?{" "}
-          <Link href="/login" className="text-green-600 hover:underline">
-            Sign in
-          </Link>
-        </p>
+                Already have an account? Login
+              </Anchor>
+            </Group>
+          </form>
+        </Paper>
       </div>
-    </div>
+    </>
   );
 }
