@@ -56,3 +56,34 @@ export async function PUT(
   });
   return NextResponse.json(updated);
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const pharmacyOwner = await prisma.pharmacyOwner.findUnique({
+    where: { userId: session.user.id },
+  });
+
+  if (!pharmacyOwner) {
+    return NextResponse.json({ error: "No pharmacy found" }, { status: 404 });
+  }
+
+  const inventoryItem = await prisma.inventory.findUnique({
+    where: { id },
+  });
+
+  if (!inventoryItem || inventoryItem.pharmacyId !== pharmacyOwner.pharmacyId) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  }
+
+  await prisma.inventory.delete({ where: { id } });
+
+  return NextResponse.json({ success: true });
+}

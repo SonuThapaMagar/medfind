@@ -125,7 +125,7 @@ export function Sidebar({ email, pharmacyName }: SidebarProps) {
           <LogOut size={20} className="shrink-0" />
           <span
             className={`
-            text-sm font-medium whitespace-nowrap
+            text-sm font-medium whitespace-nowrap cursor-pointer
             transition-all duration-200 overflow-hidden
             ${isOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}
           `}
