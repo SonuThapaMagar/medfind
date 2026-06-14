@@ -81,31 +81,19 @@ export default function HomePage() {
 
   return (
     <Container size="md" mt="xl">
-      <Title order={1}>Welcome to Mantine!</Title>
-      <Text c="dimmed" mb="md">
-        If you can see this styled nicely, the installation worked.
-      </Text>
-
-      <Button variant="filled" color="blue">
-        Click Me
-      </Button>
-
-      <main className="min-h-screen bg-bg">
+      <main className="min-h-screen">
         {/* Hero + Search */}
-        <div className="bg-card-bg border-b border-light-gray px-4 py-10">
+        <div className="sticky border-b border-light-gray p-4">
           <div className="max-w-2xl mx-auto">
-            <p className="text-xs font-semibold text-secondary mb-2 tracking-widest uppercase">
-              Kathmandu
-            </p>
             <h1 className="text-2xl font-bold text-primary mb-1">
               Find medicines near you
             </h1>
-            <p className="text-sm text-muted mb-6">
+            {/* <p className="text-sm text-muted mb-6">
               Search across pharmacies in Kathmandu
-            </p>
+            </p> */}
 
             {/* Search input */}
-            <div className="flex items-center gap-2 bg-bg border border-light-gray rounded-lg px-3 py-2 focus-within:border-secondary transition-colors">
+            <div className="flex items-center gap-2 bg-white border border-primary rounded-full px-3 py-2 focus-within:border-secondary transition-colors">
               <svg
                 width="16"
                 height="16"

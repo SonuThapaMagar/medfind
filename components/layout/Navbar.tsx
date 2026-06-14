@@ -6,10 +6,14 @@ export default async function Navbar() {
   const session = await getServerSession(authOptions);
 
   return (
-    <nav className="bg-primary border-b border-light-gray px-6 h-14 flex items-center justify-between sticky top-0 z-50 shadow-md">
+    <nav className="bg-light border-b border-light-gray px-6 h-14 flex items-center justify-between sticky top-0 z-50 shadow-md">
       <Link href="/" className="flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-secondary" />
-        <span className="text-sm font-semibold text-light">MedFind Nepal</span>
+        <div className="w-10 h-10">
+          <img src="./logo.png" alt="MedFind Nepal" />
+        </div>
+        <span className="text-primary font-secondary font-bold text-xl">
+          MedFind
+        </span>
       </Link>
 
       <div className="flex items-center gap-4">
@@ -46,7 +50,7 @@ export default async function Navbar() {
         ) : (
           <Link
             href="/login"
-            className="text-sm bg-primary hover:bg-secondary text-white px-4 py-1.5 rounded-lg transition-colors"
+            className="text-sm font-regular bg-primary hover:bg-secondary text-light px-4 py-1.5 rounded-md transition-colors"
           >
             Sign in
           </Link>
