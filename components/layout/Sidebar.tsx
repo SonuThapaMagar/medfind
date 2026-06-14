@@ -51,7 +51,7 @@ export function Sidebar({ email, pharmacyName }: SidebarProps) {
           text-base font-bold
         "
         >
-          <img src="./logo.png" alt="" />
+          <img src="../logo.png" alt="" />
         </div>
 
         {/* Name + email — hidden when collapsed */}

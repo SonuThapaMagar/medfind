@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { prisma } from "@/lib/prisma";
+import { Header } from "@/components/layout/Header";
 
 export default async function DashboardLayout({
   children,
@@ -22,23 +23,15 @@ export default async function DashboardLayout({
   });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="flex h-screen w-full overflow-hidden">
       <Sidebar
         pharmacyName={pharmacyOwner?.pharmacy.name ?? "My Pharmacy"}
         email={session.user.email}
       />
-      <main
-        className="dashboard-main"
-        style={{
-          flex: 1,
-          padding: "2rem",
-          background: "var(--color-bg)",
-          minWidth: 0,
-        }}
-      >
-        {" "}
-        {children}
-      </main>
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-y-auto p-4 min-w-0"> {children}</main>
+      </div>
     </div>
   );
 }
