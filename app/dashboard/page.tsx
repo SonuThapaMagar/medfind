@@ -1,30 +1,7 @@
 "use client";
 
+import { InventoryItem, Medicine, Pharmacy } from "@/types/index.type";
 import { useEffect, useState } from "react";
-
-type Medicine = {
-  id: string;
-  name: string;
-  genericName: string;
-  category: string;
-  unit: string;
-};
-
-type InventoryItem = {
-  id: string;
-  quantity: number;
-  price: number;
-  medicine: Medicine;
-};
-
-type Pharmacy = {
-  id: string;
-  name: string;
-  address: string;
-  phone: string;
-  isOpen: boolean;
-  inventory: InventoryItem[];
-};
 
 export default function DashboardPage() {
   const [pharmacy, setPharmacy] = useState<Pharmacy | null>(null);
@@ -46,7 +23,7 @@ export default function DashboardPage() {
   const [addError, setAddError] = useState("");
   const [adding, setAdding] = useState(false);
 
-  function handleEdit(item: InventoryItem) {
+  function handleEdit(item:InventoryItem) {
     setEditingId(item.id);
     setEditQuantity(String(item.quantity));
     setEditPrice(String(item.price));

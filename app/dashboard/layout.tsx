@@ -1,8 +1,8 @@
-// app/dashboard/layout.tsx
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { prisma } from "@/lib/prisma";
 
 export default async function DashboardLayout({
   children,
@@ -16,37 +16,29 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
+  const pharmacyOwner = await prisma.pharmacyOwner.findFirst({
+    where: { userId: session.user.id },
+    include: { pharmacy: true },
+  });
+
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 text-white flex flex-col p-6 gap-4">
-        <p className="text-lg font-semibold">Pharmacy Dashboard</p>
-        <p className="text-sm text-gray-400">{session.user.email}</p>
-
-        <nav className="flex flex-col gap-2 mt-6">
-          <Link
-            href="/dashboard"
-            className="hover:bg-gray-700 px-3 py-2 rounded"
-          >
-            Overview
-          </Link>
-          <Link
-            href="/dashboard/inventory"
-            className="hover:bg-gray-700 px-3 py-2 rounded"
-          >
-            Inventory
-          </Link>
-          <Link
-            href="/dashboard/profile"
-            className="hover:bg-gray-700 px-3 py-2 rounded"
-          >
-            Pharmacy Profile
-          </Link>
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <main className="flex-1 bg-gray-50 p-8">{children}</main>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <Sidebar
+        pharmacyName={pharmacyOwner?.pharmacy.name ?? "My Pharmacy"}
+        email={session.user.email}
+      />
+      <main
+        className="dashboard-main"
+        style={{
+          flex: 1,
+          padding: "2rem",
+          background: "var(--color-bg)",
+          minWidth: 0,
+        }}
+      >
+        {" "}
+        {children}
+      </main>
     </div>
   );
 }

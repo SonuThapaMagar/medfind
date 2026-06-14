@@ -1,23 +1,20 @@
-import Link from "next/link";
+import { Button, Container, Group, Text, Title } from "@mantine/core";
+import classes from "@/components/modules/NotFoundImage.module.css";
 
 export default function NotFoundPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center max-w-sm">
-        <p className="text-5xl font-medium text-gray-200 mb-4">404</p>
-        <h2 className="text-lg font-medium text-gray-900 mb-2">
-          Page not found
-        </h2>
-        <p className="text-sm text-gray-400 mb-6">
-          The page you're looking for doesn't exist.
-        </p>
-        <Link
-          href="/"
-          className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-        >
-          Back to home
-        </Link>
-      </div>
-    </div>
+    <Container className={classes.root}>
+      <div className={classes.label}>404</div>
+      <Title className={classes.title}>You have found a secret place.</Title>
+      <Text c="dimmed" size="lg" ta="center" className={classes.description}>
+        Unfortunately, this is only a 404 page. You may have mistyped the
+        address, or the page has been moved to another URL.
+      </Text>
+      <Group justify="center">
+        <Button variant="subtle" size="md">
+          Take me back to home page
+        </Button>
+      </Group>
+    </Container>
   );
 }

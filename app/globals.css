@@ -1,26 +1,57 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import "@mantine/core/styles.css";
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  /* --color-primary: #01377d, */
+  --color-primary: #017be1;
+  --color-secondary: #06a9df;
+  --color-tertiary: #97e7f5;
+
+  --color-success-light: #7ed348;
+  --color-success: #26b170;
+
+  --color-accent: #39ac86;
+  --color-light: #f9fafb;
+
+  --color-bg: #f1f5f9;
+  --color-muted: #6c7e93;
+
+  --color-card-bg: #ffffff;
+  --color-card-label: #eef2f6;
+
+  --color-light-gray: #e0e6eb;
+  --color-text-dark: #152232;
+
+  --color-danger: #a12c2c;
+  --color-soft-danger: #e94f37;
+
+  --text-small: 10px;
+
+  --font-primary: "Inter", sans-serif;
+  --font-secondary: "Google-Sans-Flex", sans-serif;
+  --font-tertiary: "Montserrat", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  font-family: var(--font-primary);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 10 !important;
 }

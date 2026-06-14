@@ -10,10 +10,19 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@prisma/client": "5.22.0",
+=======
+    "@mantine/core": "^9.3.1",
+    "@mantine/form": "^9.3.1",
+    "@mantine/hooks": "^9.3.1",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+>>>>>>> dev
     "@tanstack/react-query": "^5.101.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
+    "lucide-react": "^1.18.0",
     "next": "16.2.7",
     "next-auth": "^4.24.14",
     "prisma": "5.22.0",
@@ -32,6 +41,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "leaflet": "^1.9.4",
+    "postcss-preset-mantine": "^1.18.0",
+    "postcss-simple-vars": "^7.0.1",
     "react-leaflet": "^5.0.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",

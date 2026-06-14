@@ -3,6 +3,33 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  const pharmacy = await prisma.pharmacy.findUnique({
+    where: { id },
+    include: {
+      inventory: {
+        include: { medicine: true },
+        orderBy: { medicine: { name: "asc" } },
+        where: { quantity: { gt: 0 } },
+      },
+    },
+  });
+
+  if (!pharmacy) {
+    return NextResponse.json(
+      {
+        error: "Pharmacy not found",
+      },
+      { status: 404 },
+    );
+  }
+  return NextResponse.json(pharmacy);
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
