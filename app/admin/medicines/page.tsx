@@ -1,16 +1,8 @@
 "use client";
 
+import Pagination from "@/components/ui/Pagination";
+import { Medicine } from "@/types/index.type";
 import { useEffect, useState } from "react";
-
-type Medicine = {
-  id: string;
-  name: string;
-  genericName: string;
-  category: string;
-  unit: string;
-  description?: string;
-  _count: { inventory: number };
-};
 
 export default function AdminMedicinesPage() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -26,6 +18,9 @@ export default function AdminMedicinesPage() {
   const [description, setDescription] = useState("");
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     async function fetchMedicines() {
@@ -93,6 +88,16 @@ export default function AdminMedicinesPage() {
     }
     setDeleting(null);
   }
+
+  // --- PAGINATION LOGIC ---
+  const indexOfLastMedicine = currentPage * itemsPerPage;
+  const indexOfFirstMedicine = indexOfLastMedicine - itemsPerPage;
+  const currentMedicine = medicines.slice(
+    indexOfFirstMedicine,
+    indexOfLastMedicine,
+  );
+  const totalPages = Math.ceil(medicines.length / itemsPerPage);
+
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-64">
@@ -205,6 +210,9 @@ export default function AdminMedicinesPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
+                S.N
+              </th>
+              <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
                 Medicine
               </th>
               <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
@@ -220,34 +228,54 @@ export default function AdminMedicinesPage() {
             </tr>
           </thead>
           <tbody>
-            {medicines.map((m) => (
-              <tr key={m.id} className="border-t border-gray-100">
-                <td className="px-6 py-4">
-                  <p className="text-sm font-medium text-gray-900">{m.name}</p>
-                  <p className="text-xs text-gray-400">{m.genericName}</p>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                    {m.category}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">{m.unit}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  {m._count.inventory} pharmacies
-                </td>
-                <td className="px-6 py-4">
-                  <button
-                    onClick={() => handleDelete(m.id)}
-                    disabled={deleting === m.id}
-                    className="text-xs text-red-400 hover:text-red-600 disabled:opacity-50"
-                  >
-                    {deleting === m.id ? "Deleting..." : "Delete"}
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {currentMedicine.map((m, index) => {
+              const serialNumber = indexOfFirstMedicine + index + 1;
+
+              return (
+                <tr key={m.id} className="border-t border-gray-100">
+                  <td className="px-6 py-4">
+                    <p className="text-sm text-gray-500">{serialNumber}</p>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <p className="text-sm font-medium text-gray-900">
+                      {m.name}
+                    </p>
+                    <p className="text-xs text-gray-400">{m.genericName}</p>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                      {m.category}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{m.unit}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {m._count.inventory} pharmacies
+                  </td>
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={() => handleDelete(m.id)}
+                      disabled={deleting === m.id}
+                      className="text-xs text-red-400 hover:text-red-600 disabled:opacity-50"
+                    >
+                      {deleting === m.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
+
+         {/* --- PAGINATION UI CONTROLS --- */}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={medicines.length}
+                  indexOfFirstItem={indexOfFirstMedicine}
+                  indexOfLastItem={indexOfLastMedicine}
+                  onPageChange={setCurrentPage}
+                />
       </div>
     </div>
   );

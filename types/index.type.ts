@@ -5,6 +5,7 @@ export type Medicine = {
   category: string;
   unit: string;
   description?: string;
+  _count: { inventory: number };
 };
 
 export type Pharmacy = {
@@ -20,6 +21,10 @@ export type Pharmacy = {
   createdAt: string;
   updatedAt: string;
   inventory: InventoryItem[];
+  _count: { inventory: number };
+  owner: {
+    user: { name: string; email: string };
+  } | null;
 };
 
 export type PharmacyDetail = Pharmacy & {
@@ -30,8 +35,8 @@ export type InventoryItem = {
   id: string;
   quantity: number;
   price: number;
-  medicine: Medicine; 
-  pharmacy?: Pharmacy; 
+  medicine: Medicine;
+  pharmacy?: Pharmacy;
 };
 
 export type SearchResult = {
@@ -40,4 +45,12 @@ export type SearchResult = {
   quantity: number;
   medicine: Medicine;
   pharmacy: Pharmacy;
+};
+
+export type Role = "ADMIN" | "PHARMACY_OWNER" | "USER";
+export type Users = {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
 };

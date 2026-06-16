@@ -80,18 +80,20 @@ export default function HomePage() {
   }, [searchTerm, category]);
 
   return (
-    <Container size="md" mt="xl">
+    <Container size="xl" mt="xl">
+      <header>
+        <h1 className="text-2xl font-bold text-primary mb-1">
+          Find medicines near you
+        </h1>
+        <p className="text-sm text-muted mb-6">
+          Find pharmacies near your location
+        </p>
+      </header>
+
       <main className="min-h-screen">
         {/* Hero + Search */}
         <div className="sticky border-b border-light-gray p-4">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold text-primary mb-1">
-              Find medicines near you
-            </h1>
-            {/* <p className="text-sm text-muted mb-6">
-              Search across pharmacies in Kathmandu
-            </p> */}
-
             {/* Search input */}
             <div className="flex items-center gap-2 bg-white border border-primary rounded-full px-3 py-2 focus-within:border-secondary transition-colors">
               <svg

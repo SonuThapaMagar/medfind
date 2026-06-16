@@ -3,18 +3,28 @@
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
-import { NAV_LINKS } from "@/constants/sidebar.constants";
+import {
+  ADMIN_NAV_LINKS,
+  OWNER_NAV_LINKS,
+} from "@/constants/sidebar.constants";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { LogoutModal } from "../ui/LogoutModal";
 
-interface SidebarProps {
-  email: string | null | undefined;
-  pharmacyName: string;
-}
+type SidebarProps = {
+  name: string;
+  email: string;
+  role: "ADMIN" | "PHARMACY_OWNER";
+};
 
-export function Sidebar({ email, pharmacyName }: SidebarProps) {
+export function Sidebar({ name, email, role }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const navItems = role === "ADMIN" ? ADMIN_NAV_LINKS : OWNER_NAV_LINKS;
+
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(href + "/");
+  }
 
   return (
     <nav
@@ -28,14 +38,7 @@ export function Sidebar({ email, pharmacyName }: SidebarProps) {
       {/* ── Toggle button ── */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className=" absolute -right-3 top-8 z-10
-    w-6 h-6 rounded-full cursor-pointer
-    bg-primary text-white
-    flex items-center justify-center
-    shadow-md
-    hover:bg-[var(--color-secondary)]
-    transition-colors duration-200
-  "
+        className=" absolute -right-3 top-8 z-10 w-6 h-6 rounded-full cursor-pointer    bg-primary text-white    flex items-center justify-center     shadow-md    hover:bg-[var(--color-secondary)]    transition-colors duration-200 "
         aria-label="Toggle sidebar"
       >
         {isOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
@@ -63,7 +66,7 @@ export function Sidebar({ email, pharmacyName }: SidebarProps) {
         `}
         >
           <span className="text-sm font-semibold text-[var(--color-text-dark)] truncate">
-            {pharmacyName}
+            {name}
           </span>
           <span className="text-[11px] text-[var(--color-muted)] truncate">
             {email}
@@ -76,8 +79,7 @@ export function Sidebar({ email, pharmacyName }: SidebarProps) {
 
       {/* ── Nav links ── */}
       <ul className="flex flex-col gap-1 p-3 flex-1 mt-2">
-        {NAV_LINKS.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href;
+        {navItems.map(({ href, label, icon: Icon }) => {
           return (
             <li key={href}>
               <Link
@@ -88,7 +90,7 @@ export function Sidebar({ email, pharmacyName }: SidebarProps) {
                   transition-colors duration-150
                   ${isOpen ? "px-3" : "justify-center px-0"}
                   ${
-                    isActive
+                    isActive(href)
                       ? "bg-blue-50 text-[var(--color-primary)]"
                       : "text-[var(--color-muted)] hover:bg-[var(--color-card-label)] hover:text-[var(--color-text-dark)]"
                   }
@@ -113,7 +115,7 @@ export function Sidebar({ email, pharmacyName }: SidebarProps) {
       {/* ── Bottom: logout ── */}
       <div className="p-3 border-t border-[var(--color-light-gray)]">
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={() => setShowLogoutModal(true)}
           title={!isOpen ? "Logout" : undefined}
           className={`
             w-full flex items-center gap-3 rounded-lg h-11
@@ -134,6 +136,11 @@ export function Sidebar({ email, pharmacyName }: SidebarProps) {
           </span>
         </button>
       </div>
+
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      />
     </nav>
   );
 }

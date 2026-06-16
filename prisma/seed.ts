@@ -10,7 +10,7 @@ async function main() {
   console.log("Seeding db");
 
   // --- USERS first (no dependencies on other tables) ---
-  const hashedPassword = await bcrypt.hash("password123", 10);
+  const hashedPassword = await bcrypt.hash("Password@123", 10);
 
   const adminUser = await prisma.user.create({
     data: {
@@ -239,15 +239,6 @@ async function main() {
 
   //create pharmacy
   const pharmacies = [
-    {
-      name: "New Road Pharmacy",
-      email: "newroad@gmail.com",
-      address: "New Road, Kathmandu",
-      lat: 27.7041,
-      lng: 85.3145,
-      phone: "01-4221234",
-      isOpen: true,
-    },
     {
       name: "New Road Pharmacy",
       email: "newroad@gmail.com",

@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 
-export default async function DashboardLayout({
+export default async function PharmacyOwnerLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -13,11 +13,11 @@ export default async function DashboardLayout({
   const session = await getServerSession(authOptions);
 
   if (!session) redirect("/login");
-  if (session.user.role !== "PHARMACY_OWNER" && session.user.role !== "ADMIN") {
-    redirect("/");
-  }
 
-  const pharmacyOwner = await prisma.pharmacyOwner.findFirst({
+  // Only PHARMACY_OWNER can access /pharmacyOwner routes
+  if (session.user.role !== "PHARMACY_OWNER") redirect("/");
+
+  const pharmacyOwner = await prisma.pharmacyOwner.findUnique({
     where: { userId: session.user.id },
     include: { pharmacy: true },
   });
@@ -25,12 +25,13 @@ export default async function DashboardLayout({
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar
-        pharmacyName={pharmacyOwner?.pharmacy.name ?? "My Pharmacy"}
-        email={session.user.email}
+        name={pharmacyOwner?.pharmacy.name ?? "My Pharmacy"}
+        email={session.user.email ?? ""}
+        role="PHARMACY_OWNER"
       />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-4 min-w-0"> {children}</main>
+        <main className="flex-1 overflow-y-auto p-6 min-w-0">{children}</main>
       </div>
     </div>
   );

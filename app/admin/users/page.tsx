@@ -1,33 +1,26 @@
 "use client";
 
 import Pagination from "@/components/ui/Pagination";
-import { Pharmacy } from "@/types/index.type";
+import { Users } from "@/types/index.type";
 import { Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export default function AdminPharmaciesPage() {
-  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+export default function AdminUserMgmtPage() {
+  const [users, setUsers] = useState<Users[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 2;
+
   useEffect(() => {
-    async function fetchPharmacies() {
-      const response = await fetch("/api/admin/pharmacies");
+    async function fetchUsers() {
+      const response = await fetch("/api/admin/users");
       const data = await response.json();
-      setPharmacies(data);
+      setUsers(data);
       setIsLoading(false);
     }
-    fetchPharmacies();
+    fetchUsers();
   }, []);
-
-  // --- PAGINATION LOGIC ---
-  const indexOfLastPharmacy = currentPage * itemsPerPage;
-  const indexOfFirstPharmacy = indexOfLastPharmacy - itemsPerPage;
-  const currentPharmacy = pharmacies.slice(
-    indexOfFirstPharmacy,
-    indexOfLastPharmacy,
-  );
-  const totalPages = Math.ceil(pharmacies.length / itemsPerPage);
 
   if (isLoading)
     return (
@@ -36,10 +29,16 @@ export default function AdminPharmaciesPage() {
       </div>
     );
 
+  // --- PAGINATION LOGIC ---
+  const indexOfLastUser = currentPage * itemsPerPage;
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
   return (
     <div>
       <h1 className="text-lg font-medium text-gray-900 mb-6">
-        Pharmacies ({pharmacies.length})
+        Users ({users.length})
       </h1>
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -50,19 +49,13 @@ export default function AdminPharmaciesPage() {
                 S.N
               </th>
               <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
-                Pharmacy
+                Name
               </th>
               <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
-                Owner
+                Email
               </th>
               <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
-                Medicines
-              </th>
-              <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
-                Status
-              </th>
-              <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
-                Phone
+                Role
               </th>
               <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">
                 Actions
@@ -70,49 +63,22 @@ export default function AdminPharmaciesPage() {
             </tr>
           </thead>
           <tbody>
-            {currentPharmacy.map((p, index) => {
-              const serialNumber = indexOfFirstPharmacy + index + 1;
+            {currentUsers.map((u, index) => {
+              const serialNumber = indexOfFirstUser + index + 1;
               return (
-                <tr key={p.id} className="border-t border-gray-100">
+                <tr key={u.id} className="border-t border-gray-100">
                   <td className="px-6 py-4">
                     <p className="text-sm text-gray-500">{serialNumber}</p>
                   </td>
-
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-gray-900">
-                      {p.name}
+                      {u.name}
                     </p>
-                    <p className="text-xs text-gray-400">{p.address}</p>
                   </td>
                   <td className="px-6 py-4">
-                    {p.owner ? (
-                      <div>
-                        <p className="text-sm text-gray-700">
-                          {p.owner.user.name}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {p.owner.user.email}
-                        </p>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">No owner</span>
-                    )}
+                    <p className="text-xs text-gray-400">{u.email}</p>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {p._count.inventory}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        p.isOpen
-                          ? "bg-green-50 text-green-600"
-                          : "bg-gray-100 text-gray-400"
-                      }`}
-                    >
-                      {p.isOpen ? "Open" : "Closed"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{p.phone}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{u.role}</td>
                   <td className="px-6 py-4 text-sm">
                     <span className="flex gap-4">
                       <button className="text-primary hover:text-primar/90 font-medium cursor-pointer">
@@ -128,14 +94,13 @@ export default function AdminPharmaciesPage() {
             })}
           </tbody>
         </table>
-
         {/* --- PAGINATION UI CONTROLS --- */}
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          totalItems={pharmacies.length}
-          indexOfFirstItem={indexOfFirstPharmacy}
-          indexOfLastItem={indexOfLastPharmacy}
+          totalItems={users.length}
+          indexOfFirstItem={indexOfFirstUser}
+          indexOfLastItem={indexOfLastUser}
           onPageChange={setCurrentPage}
         />
       </div>

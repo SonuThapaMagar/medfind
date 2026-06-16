@@ -69,9 +69,9 @@ export default function LoginPage() {
     if (result?.ok) {
       const session = await getSession();
       if (session?.user?.role === "ADMIN") {
-        router.push("/admin");
+        router.push("/admin/overview");
       } else if (session?.user?.role === "PHARMACY_OWNER") {
-        router.push("/dashboard");
+        router.push("/pharmacyOwner/overview");
       } else {
         router.push("/");
       }
