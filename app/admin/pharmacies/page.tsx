@@ -2,7 +2,8 @@
 
 import Pagination from "@/components/ui/Pagination";
 import { Pharmacy } from "@/types/index.type";
-import { Pencil, Trash } from "lucide-react";
+import { Pencil, Plus, Trash } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function AdminPharmaciesPage() {
@@ -37,10 +38,19 @@ export default function AdminPharmaciesPage() {
     );
 
   return (
-    <div>
-      <h1 className="text-lg font-medium text-gray-900 mb-6">
-        Pharmacies ({pharmacies.length})
-      </h1>
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden text-black">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-text-dark">Pharmacies</h2>
+        <Link
+          href="/dashboard/inventory/add"
+          className="text-sm bg-primary text-white px-2 py-2 rounded-lg hover:bg-secondary transition-colors"
+        >
+          <span className="flex items-center gap-1">
+            <Plus className="w-4 h-4" /> Create Pharmacy
+          </span>
+        </Link>
+      </div>
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <table className="w-full">
